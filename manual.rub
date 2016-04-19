@@ -1,0 +1,93 @@
+1.- abrir una línea de comandos.
+2.- entrar en la carpeta de nuestro proyecto
+3.- usaremos la siguiente estructura de carpetas:
+		carpetaPrincipal
+			-dist
+				-index.html
+				-bundle.js
+			-src
+				-pages(dentro irán todos nuestros componentes react)
+				-index.js
+			-package.json
+			-webpack.config.js
+3.- ejecutar el comando npm init(tener previamente instalado el node pack manager) el cual inicializara nuestro archivo de configuración package.json
+4.- insertar los datos que se piden o en su defecto ejecutar npm init -y(para asignar yes por default a todo)
+5.- ejecutar los siguientes comandos:
+
+		-npm install --save-dev webpack webpack-dev-server react-hot-loader
+		-npm install --save-dev babel-core babel-loader
+		-npm install --save-dev babel-preset-es2015 babel-preset-react
+		-npm install --save react react-dom react-router
+		
+el comando npm install instala las dependencias que vamos a utilizar en nuestro proyecto
+el comando --save indica que se guarde en nuestro archivo de configuración package.json
+el comando -dev indica que se utilizaran para desarrollo 
+webpack es el empaquetador de modulos y nos sirve para fragmentar codigo, a groso modo carga solo lo que se necesite en la página.
+babel es un loader de webpack que nos facilita transpilar codigo javascript ES6 o JSX para que los navegadores lo puedan leer.
+existen distintos transpiladores pero en este proyecto solo ocupamos babel 
+los presets son plugins de babel que cumplen una función en especifico en este caso el preset es2015 transpila codiogo es2015(ES6) y el preset react transpila codigo jsx que es el utilizado por react
+finalmente react, react-dom y react-router son los paquetes que vamos a utilizar para usar react (v.15.0.1) versiones anteriores no ocupan react-dom
+6.- agregar los plugins de babel al archivo package.json justo encima de el campo "devDependencies"
+	"babel":{
+	"presets":[
+		"es2015",
+		"react"
+	]
+  },
+ esto es debido a que babel no los utiliza por default
+7.- crear nuestro archivo de configuración webpack.config.js (debe llevar forzosamente este nombre y es donde le indicaremos la configuración del webpack)
+ en la primer línea le vamos a importar la clase webpack, escribir la siguiente línea:
+ var webpack = require('webpack');
+ 
+ después comenzaremos con la configuración del webpack para ello utilizaremos el patrón de módulos
+ 
+ así que nuestra siguiente línea será declarar el módulo:
+ module.exports = {};
+ dentro de esa variable irá toda nuestra configuración. 
+ comenzamos declarando nuestro archivo de entrada (index.js)
+	entry: [
+		'webpack-dev-server/client?http://localhost:8080',
+		'webpack/hot/only-dev-server',
+		'./src/index.js'
+	]
+después declaramos nuestro contenedor de los loaders
+	module:{
+		loaders: [{
+			test: /\.js?$/,
+			exclude: /node_modules/,
+			loader: 'react-hot!babel'
+		}]
+	},
+le indicamos que extensiones debe buscar 
+	resolve: {
+		extensions: ['','.js']
+	},
+finalmente le indicamos la salida y el servidor de desarrollo a utilizar, más el plugin que desconozco para que se utiliza
+	output:{
+			path: 'dist',
+			publicPath: '/',
+			filename: 'bundle.js'
+		},
+		devServer:{
+			contentBase: './dist',
+			hot: true
+		},
+		plugins: [
+			new webpack.HotModuleReplacementPlugin()
+		]
+
+8.- finalmente para cuestiones de prueba insertaremos la siguiente línea al index.js
+console.log('React is up and running!');
+
+9.- y el siguiente codigo a nuestro index.html
+<!DOCTYPE html>
+<html>
+    <body>
+        <div id="app"></div>
+        <script src="bundle.js"></script>
+    </body>
+</html>
+
+10.- Finalmente ejecutamos el comando webpack-dev-server que inizializa el servidor de desarrollo.
+En caso de error ejecutar el siguiente comando que instalará webpack de manera global
+npm install -g webpack webpack-dev-server
